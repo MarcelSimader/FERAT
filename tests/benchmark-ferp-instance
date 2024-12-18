@@ -1,0 +1,97 @@
+#! /usr/bin/bash
+# Author: Marcel Simader (marcel.simader@jku.at)
+# Date: 05.03.2024
+# (c) Marcel Simader 2024, Johannes Kepler Universität Linz
+
+# TODO
+
+set -o pipefail
+
+# INPUTS:
+#   - 'DB', path to database file
+#   - 'EXP_FILE', the expansion CNF file
+#   - 'QBF_FILE', the QBF file
+#   - 'FERP_FILE', the FERP file
+#   - 'TEST_DIR', the path to this script's folder
+#   - 'SPACE_LIMIT', the space limit in MB
+#   - 'TIME_LIMIT', the time limit in s
+
+DB="${1}"
+EXP_FILE="${2}"
+QBF_FILE="${3}"
+FERP_FILE="${4}"
+TEST_DIR="${5}"
+SPACE_LIMIT="${6}"
+TIME_LIMIT="${7}"
+
+source "${TEST_DIR}/.shared"
+
+mkdir -p "$HOME/tmp"
+TMP="`mktemp -p "$HOME/tmp" benchmark-XXXX.tmp`"
+TIME_TMP="`mktemp -p "$HOME/tmp" benchmark-time-XXXX.tmp`"
+chmod 0664 "${TMP}" "${TIME_TMP}"
+
+int_cleanup() {
+    # Beter to use mv instead of rm, for catastrophic cases
+    mv -f "${TMP}" "${TIME_TMP}" "/tmp"
+    exit "$1"
+}
+trap "int_cleanup 130" SIGINT
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~ Set Up ~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+assert_cmd python2
+assert_cmd runlim --version '2.0.[0-9]+(rc[0-9]+)?'
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~ Run Solver ~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Run FERAT on the files
+subsection "Running ferp..."
+(
+    trap 'kill 0; int_cleanup 130' SIGINT;
+    trap 'kill 0; int_cleanup 137' SIGKILL;
+    runlim --kill --propagate \
+        --space-limit="${SPACE_LIMIT}" --real-time-limit="${TIME_LIMIT}" \
+        --output-file="${TIME_TMP}" \
+        python2 ${TEST_DIR}/../../ferp-models/pipeline.py \
+        "${EXP_FILE}" "${QBF_FILE}" "${FERP_FILE}" \
+        2>&1
+) | tee "${TMP}"; code=$?
+echo "( 'ferp' exited with code ${code} )"
+
+# ~~~~~~~~~~~~~~~~~~~~ Handle Errors ~~~~~~~~~~~~~~~~~~~~
+
+if [[ "${code}" -ne 0 ]]; then
+    case "${code}" in
+        1|2|3|4|5|6|7|11)
+            REASON="RUNLIM(${code}): `grep -Po -m1 '(?<=status:[ \t]).*$' "${TIME_TMP}" || echo ?`" ;;
+        137)
+            REASON="SIGKILL(${code}): `grep -Eo -m1 'OOM|TIME' "${TMP}" || echo ?`" ;;
+        *)
+            REASON="MISC(${code})" ;;
+    esac
+    sqlite3 <<- EOF
+.open '${DB}'
+.timeout 30000
+INSERT INTO errors VALUES ('${EXP_FILE}', '${REASON}');
+EOF
+    echo "Error '${REASON}'"
+    echo "Continuing..."
+    echo
+    int_cleanup 0
+fi
+
+# Insert into database
+TOTAL_TIME="`grep -Po '(?<=time:			)\d+.\d*(?= seconds)' "${TIME_TMP}" || echo 0`"
+sqlite3 <<- EOF
+.open '${DB}'
+.timeout 30000
+INSERT INTO benchmark VALUES ('${EXP_FILE}', ${TOTAL_TIME});
+EOF
+echo
+
+int_cleanup 0

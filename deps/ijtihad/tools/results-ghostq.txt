@@ -1,0 +1,12 @@
+|    Normal     | Preprocessed  | Test Name
++---------------+---------------+---------------------------------
+|   29.87 ERROR |   30.00 ERROR | test0a0000.q
+|   29.99 ERROR |   29.96 ERROR | test0a0001.q
+|   29.98 ERROR |   29.99 ERROR | test0a0002.q
+|   29.99 ERROR |   29.99 ERROR | test0a0003.q
+|   29.99 ERROR |   29.99 ERROR | test0a0004.q
++---------------+---------------+---------------------------------
+|        149.82 |        149.93 | TOTAL TIME 
+|             0 |             0 | TOTAL SAT  
+|             0 |             0 | TOTAL UNSAT
+|             5 |             5 | TOTAL ERROR

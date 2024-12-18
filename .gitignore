@@ -1,0 +1,23 @@
+# Author: Marcel Simader (marcel.simader@jku.at)
+# Date: 25.01.2024
+# (c) Marcel Simader 2024, Johannes Kepler Universität Linz
+
+# ignore CMake stuff
+build/
+ferat/bin/
+
+# python files
+__pycache__/
+.venv/
+*.egg-info/
+.mypy_cache/
+
+# C stuff
+.cache/
+
+# documentation stuff
+_docs/
+
+# testing stuff
+tmp/
+tests/*.sql

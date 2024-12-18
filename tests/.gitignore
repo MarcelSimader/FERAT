@@ -1,0 +1,7 @@
+# Author: Marcel Simader (marcel.simader@jku.at)
+# Date: 30.01.2024
+# (c) Marcel Simader 2024, Johannes Kepler Universität Linz
+
+# These files are too big to store in the repository...
+logs/
+artifacts/

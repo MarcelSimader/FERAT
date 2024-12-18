@@ -1,0 +1,77 @@
+|    Normal     | Preprocessed  | Test Name
++---------------+---------------+---------------------------------
+|  119.98 ERROR |  119.94 ERROR | adder-10-sat.qdimacs
+|  119.63 ERROR |  119.98 ERROR | adder-12-sat.qdimacs
+|  119.95 ERROR |  119.97 ERROR | adder-12-unsat.qdimacs
+|  119.98 ERROR |  119.99 ERROR | adder-14-sat.qdimacs
+|  120.02 ERROR |  120.07 ERROR | Adder2-10-s.qdimacs
+|  120.02 ERROR |  120.10 ERROR | Adder2-16-s.qdimacs
+|       0 UNSAT |       0 UNSAT | Adder2-2-c.qdimacs
+|     .01 UNSAT |     .01 UNSAT | Adder2-8-c.qdimacs
+|  120.00 ERROR |  116.73   SAT | Adder2-8-s.qdimacs
+|       0 UNSAT |       0 UNSAT | adder-2-unsat.qdimacs
+|     .06   SAT |       0   SAT | aim-100-1_6-yes1-2-00.qdimacs
+|     .08   SAT |       0   SAT | aim-100-6_0-yes1-3-50.qdimacs
+|    2.14   SAT |   38.45   SAT | aim-200-1_6-yes1-4-90.qdimacs
+|     .06 UNSAT |       0 UNSAT | aim-50-6_0-yes1-3-50.qdimacs
+|  119.82 ERROR |  119.26 ERROR | arbiter-06-comp-error01-qbf-hardness-depth-12.qdimacs
+|  120.00 ERROR |  120.05 ERROR | arbiter-06-comp-error01-qbf-hardness-depth-15.qdimacs
+|  119.96 ERROR |    3.80 UNSAT | arbiter-06-comp-error02-qbf-hardness-depth-5.qdimacs
+|  119.93 ERROR |  120.02 ERROR | arbiter-07-comp-error01-qbf-hardness-depth-11.qdimacs
+|  119.61 ERROR |  119.98 ERROR | arbiter-07-comp-error01-qbf-hardness-depth-20.qdimacs
+|    3.68 UNSAT |       0 UNSAT | arbiter-07-comp-error01-qbf-hardness-depth-4.qdimacs
+|  119.85 ERROR |   40.31 UNSAT | arbiter-07-comp-error02-qbf-hardness-depth-6.qdimacs
+|  119.55 ERROR |  119.76 ERROR | arbiter-08-comp-error02-qbf-hardness-depth-9.qdimacs
+|  119.98 ERROR |         ERROR | arbiter-10-comp-error01-qbf-hardness-depth-10.qdimacs
+|  117.42 ERROR |       0 ERROR | arbiter-10-comp-error01-qbf-hardness-depth-22.qdimacs
+|  113.96 ERROR |  116.44 ERROR | audio_ddksynth_csynth2.cpp.qdimacs
+|     .04   SAT |       0   SAT | b12_PR_9_2.qdimacs
+|  118.29 ERROR |  118.75 ERROR | b20_C_3_2.qdimacs
+|  118.01 ERROR |  116.25 ERROR | b20_PR_7_20.qdimacs
+|     .09 UNSAT |     .01 UNSAT | b20_PR_7_90.qdimacs
+|  116.54 ERROR |  115.42 ERROR | b21_C_3_206.qdimacs
+|  118.12 ERROR |         ERROR | b22_C_2_12.qdimacs
+|         ERROR |       0 ERROR | b22_PR_8_20.qdimacs
+|  119.37 ERROR |       0 ERROR | biu.mv.xl_ao.bb-b001-p005-OPF03-c09.blif-biu.inv1.prop.bb-bmc.with-IOC.unfold-003.qdimacs
+|  118.43 ERROR |       0 ERROR | biu.mv.xl_ao.bb-b001-p005-OPF05-c02.blif-biu.inv1.prop.bb-bmc.with-IOC.unfold-004.qdimacs
+|  118.39 ERROR |       0 ERROR | biu.mv.xl_ao.bb-b001-p005-OPF05-c03.blif-biu.inv1.prop.bb-bmc.with-IOC.unfold-004.qdimacs
+|  118.64 ERROR |       0 ERROR | biu.mv.xl_ao.bb-b001-p010-IPF02-c07.blif-biu.inv1.prop.bb-bmc.with-IOC.unfold-003.qdimacs
+|         ERROR |       0 ERROR | biu.mv.xl_ao.bb-b001-p010-IPF02-c08.blif-biu.inv1.prop.bb-bmc.with-IOC.unfold-003.qdimacs
+|         ERROR |       0 ERROR | biu.mv.xl_ao.bb-b001-p010-IPF05-c07.blif-biu.inv1.prop.bb-bmc.with-IOC.unfold-003.qdimacs
+|  119.93 ERROR |       0 ERROR | biu.mv.xl_ao.bb-b001-p010-MIF01-c01.blif-biu.inv1.prop.bb-bmc.with-IOC.unfold-004.qdimacs
+|  119.92 ERROR |       0 ERROR | biu.mv.xl_ao.bb-b001-p010-MIF04-c06.blif-biu.inv1.prop.bb-bmc.with-IOC.unfold-005.qdimacs
+|  119.83 ERROR |       0 ERROR | biu.mv.xl_ao.bb-b001-p010-MIF05-c07.blif-biu.inv1.prop.bb-bmc.with-IOC.unfold-004.qdimacs
+|  119.86 ERROR |       0 ERROR | biu.mv.xl_ao.bb-b001-p010-OPF02-c08.blif-biu.inv1.prop.bb-bmc.with-IOC.unfold-003.qdimacs
+|     .04 UNSAT |       0 ERROR | biu.mv.xl_ao.bb-b003-p020-IPF01-c05.blif-biu.inv.prop.bb-bmc.conf04.01X-QBF.BB1-01X.BB2-01X.BB3-Zi.with-IOC.unfold-008.qdimacs
+|     .01 UNSAT |       0 ERROR | biu.mv.xl_ao.bb-b003-p020-IPF02-c05.blif-biu.inv.prop.bb-bmc.conf01.01X-QBF.BB1-Zi.BB2-01X.BB3-01X.with-IOC.unfold-005.qdimacs
+|       0 UNSAT |       0 ERROR | biu.mv.xl_ao.bb-b003-p020-IPF03-c03.blif-biu.inv.prop.bb-bmc.conf00.01X-QBF.BB1-01X.BB2-01X.BB3-01X.with-IOC.unfold-003.qdimacs
+|  119.97 ERROR |       0 ERROR | biu.mv.xl_ao.bb-b003-p020-IPF03-c03.blif-biu.inv.prop.bb-bmc.conf07.01X-QBF.BB1-Zi.BB2-Zi.BB3-Zi.with-IOC.unfold-008.qdimacs
+|    4.56 UNSAT |       0 ERROR | biu.mv.xl_ao.bb-b003-p020-IPF03-c03.blif-biu.inv.prop.bb-bmc.with-IOC.unfold-009.qdimacs
+|       0 UNSAT |       0 ERROR | biu.mv.xl_ao.bb-b003-p020-MIF04-c05.blif-biu.inv.prop.bb-bmc.conf01.01X-QBF.BB1-Zi.BB2-01X.BB3-01X.with-IOC.unfold-001.qdimacs
+|     .02 UNSAT |       0 ERROR | biu.mv.xl_ao.bb-b003-p020-MIF04-c05.blif-biu.inv.prop.bb-bmc.conf03.01X-QBF.BB1-Zi.BB2-Zi.BB3-01X.with-IOC.unfold-005.qdimacs
+|       0 UNSAT |       0 ERROR | biu.mv.xl_ao.bb-b003-p020-MIF04-c05.blif-biu.inv.prop.bb-bmc.conf05.01X-QBF.BB1-Zi.BB2-01X.BB3-Zi.with-IOC.unfold-003.qdimacs
+|   41.43 UNSAT |       0 ERROR | biu.mv.xl_ao.bb-b003-p020-MIF04-c05.blif-biu.inv.prop.bb-bmc.conf07.01X-QBF.BB1-Zi.BB2-Zi.BB3-Zi.with-IOC.unfold-007.qdimacs
+|         ERROR |       0 ERROR | biu.mv.xl_ao.bb-b003-p020-MIF04-c05.blif-biu.inv.prop.bb-bmc.conf07.01X-QBF.BB1-Zi.BB2-Zi.BB3-Zi.with-IOC.unfold-010.qdimacs
+|     .04 UNSAT |       0 ERROR | BLOCKS3i.5.3.qdimacs
+|     .05   SAT |       0 ERROR | BLOCKS3i.5.4.qdimacs
+|       0 UNSAT |       0 ERROR | BLOCKS3ii.4.3.qdimacs
+|       0 UNSAT |       0 ERROR | BLOCKS3ii.5.2.qdimacs
+|     .03   SAT |       0 ERROR | BLOCKS3ii.5.3.qdimacs
+|       0 UNSAT |       0 ERROR | BLOCKS3iii.4.qdimacs
+|     .01   SAT |       0 ERROR | BLOCKS3iii.5.qdimacs
+|     .36 UNSAT |       0 ERROR | BLOCKS4i.6.4.qdimacs
+|     .14 UNSAT |       0 ERROR | BLOCKS4ii.7.2.qdimacs
+|     .03 UNSAT |       0 ERROR | BLOCKS4iii.6.qdimacs
+|     .25   SAT |       0 ERROR | c1_BMC_p1_k4.qdimacs
+|   15.20   SAT |       0 ERROR | c3_BMC_p1_k256.qdimacs
+|  115.18 ERROR |       0 ERROR | C432.blif_0.10_0.20_0_0_inp_exact.qdimacs
+|         ERROR |       0 ERROR | C432.blif_0.10_0.20_0_0_out_exact.qdimacs
+|         ERROR |       0 ERROR | C432.blif_0.10_0.20_0_1_inp_exact.qdimacs
+|         ERROR |       0 ERROR | C432.blif_0.10_0.20_0_1_out_exact.qdimacs
+|     .03 UNSAT |       0 ERROR | C432.blif_0.10_1.00_0_0_inp_exact.qdimacs
+|     .06 UNSAT |       0 ERROR | C432.blif_0.10_1.00_0_0_out_exact.qdimacs
+|       0   SAT |       0 ERROR | C432.blif_0.10_1.00_0_1_inp_exact.qdimacs
+|       0   SAT |       0 ERROR | C432.blif_0.10_1.00_0_1_out_exact.qdimacs
+|         ERROR |       0 ERROR | C499.blif_0.10_0.20_0_0_inp_exact.qdimacs
+|  119.15 ERROR |       0 ERROR | C499.blif_0.10_0.20_0_0_out_exact.qdimacs
+|  119.90 ERROR |       0 ERROR | C499.blif_0.10_0.20_0_1_inp_exact.qdimacs

@@ -1,0 +1,153 @@
+# Author: Marcel Simader (marcel.simader@jku.at)
+# Date: 05.03.2024
+# (c) Marcel Simader 2024, Johannes Kepler Universität Linz
+
+# ~~~~~~~~~~~~~~~~~~~~ IO Functions ~~~~~~~~~~~~~~~~~~~~
+
+header() {
+    echo
+    echo
+    echo "------------------------- ${1}"
+    echo
+    echo
+}
+
+section() {
+    echo "--------------- ${1}"
+}
+
+subsection() {
+    echo "----- ${1}"
+}
+
+msg_start() {
+    header "Starting Execution"
+}
+
+# ~~~~~~~~~~~~~~~~~~~~ Helpers ~~~~~~~~~~~~~~~~~~~~
+
+# Checks whether a command is executable.
+# Arguments:
+#   1. the command name or path
+#   [ 2. the version flag, followed by
+#     3. the version to check, as GREP extended regex ]
+assert_cmd() {
+    if ! command -v "$1" &>/dev/null; then
+        echo "Unable to find or execute '$1'"
+        exit 1
+    elif [[ -n "$2" ]] && [[ -n "$3" ]]; then
+        if ! ( "$1" "$2" | grep -qE -m1 "$3" ); then
+            echo "Wrong version of '$1', expected '$3'"
+            exit 1
+        fi
+    fi
+}
+
+# Asks the user to confirm an action.
+# Arguments:
+#   [ 1. the prompt to display ]
+confirm() {
+    PROMPT="Are you sure (30 sec.)? [y/n] "
+    if [[ -n "$1" ]]; then PROMPT="$1? ${PROMPT}"; fi
+    read -t 30 -p "${PROMPT}" READ_RESULT
+    if [[ "${READ_RESULT}" == "y" ]]; then echo 0; return; fi
+    echo 1 # not accepted
+}
+
+# Converts seconds to 'HH:MM:SS' format.
+# Arguments:
+#   1. the seconds
+secs2time() {
+    if [[ -z "$1" ]]; then echo "Missing seconds" >  /dev/stderr; exit 1; fi
+    HOURS="$((( ${1} / 3600 )))" # [h]
+    MINS="$((( ( ${1} / 60 ) % 60 )))" # [m]
+    SECS="$((( ${1} % 60 )))" # [s]
+    echo "${HOURS}:${MINS}:${SECS}"
+}
+
+# Inverse of 'secs2time'.
+# Arguments:
+#   1. the hours
+#   2. the minutes
+#   3. the seconds
+time2secs() {
+    if [[ -z "$1" ]]; then echo "Missing hours" >  /dev/stderr; exit 1; fi
+    if [[ -z "$2" ]]; then echo "Missing minutes" >  /dev/stderr; exit 1; fi
+    if [[ -z "$3" ]]; then echo "Missing seconds" >  /dev/stderr; exit 1; fi
+    echo "$((( ${1}*60*60 + ${2}*60 + ${3} )))"
+}
+
+# Creates the command used to execute something in parallel. Usually, this will use slurm
+# to call sbatch, which will then dispatch one node with one task with one CPU thread for
+# the given script. The intent is to use it like so:
+# ```bash
+#    PARA="`parallel ...`"
+#    ${PARA} bash my_script.sh &
+# ```
+# Arguments:
+#   1. the job name
+#   2. the partition to run on
+#   3. the memory limit
+#   4. the time limit in seconds
+#   5. the log path and name format, like '${HOME}/logs/my-log-%j.txt'
+parallel() {
+    SPACE_OFFSET_MB="1024"
+    TIME_OFFSET_S="300"
+
+    if [[ -z "$1" || -z "$2" || -z "$3" || -z "$4" || -z "$5" ]]; then
+        echo "Missing arguments in 'parallel'..." > /dev/stderr
+        exit 1
+    fi
+    CMD=
+    if command -v sbatch &>/dev/null; then
+        # Offsets, so SLURM is cancelled way after runlim should cancel the processes
+        SPACE="$((( ${3} + ${SPACE_OFFSET_MB} )))" # [MB]
+        SECS_TIME="$((( ${4} + ${TIME_OFFSET_S} )))" # [s]
+
+        JOB_NAME="$1"
+        PARTITION="$2"
+        NTASKS="1"
+        NODES="1"
+        CPUS_PER_TASK="1"
+        MEM_PER_CPU="${SPACE}"
+        TIME="`secs2time "${SECS_TIME}"`"
+        LOG_NAME="$5"
+
+        CMD="sbatch \
+    --job-name=${JOB_NAME} \
+    --partition=${PARTITION} \
+    --ntasks=${NTASKS} \
+    --nodes=${NODES} \
+    --cpus-per-task=${CPUS_PER_TASK} \
+    --mem-per-cpu=${MEM_PER_CPU} \
+    --time=${TIME} \
+    --output=${LOG_NAME}"
+    else
+        if ! confirm "Unable to find 'sbatch', execute directly in parallel"; then
+            echo "Not running in parallel, exiting" > /dev/stderr
+            exit 1
+        fi
+        CMD=""
+    fi
+    echo "${CMD}"
+}
+
+# Activates the FERAT Python Virtual environment.
+#
+# Arguments:
+#   1. the venv directory
+activate-ferat() {
+    FERAT_ENV_ACTIVATE="${1}/bin/activate"
+    if ! source "${FERAT_ENV_ACTIVATE}"; then
+        echo "Unable to source Python virtual environment by sourcing \
+'${FERAT_ENV_ACTIVATE}'"
+        exit 1
+    fi
+    if ! command -v ferat &>/dev/null; then
+        echo "Unable to run 'ferat', despite sourcing the virtual environment succesfully"
+        echo "Is the package installed in the virtual environment?"
+        exit 1
+    fi
+}
+
+# vim: ft=bash

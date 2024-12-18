@@ -1,0 +1,6 @@
+# Author: Marcel Simader (marcel.simader@jku.at)
+# Date: 13.03.2024
+# (c) Marcel Simader 2024, Johannes Kepler Universität Linz
+
+libferat.a
+tests/test_*

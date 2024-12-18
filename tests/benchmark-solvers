@@ -1,0 +1,165 @@
+#! /usr/bin/bash
+# Author: Marcel Simader (marcel.simader@jku.at)
+# Date: 24.01.2024
+# (c) Marcel Simader 2024, Johannes Kepler Universität Linz
+
+set -o pipefail
+
+if [[ ( "${1}" =~ -h|--help ) || ( "${#}" -lt 2 ) ]]; then
+    echo "Usage: ${0} [-h,--help] SOLVER_BIN_LIST PROOF_TYPE_LIST SOLVER_ARGS_LIST "
+    echo "            [SQL_DB] [EXP_DIR] [EXP_FILE_PAT]"
+    echo
+    echo "Takes files found in 'artifacts/exp/' and runs them using each of the"
+    echo "specified solver binaries. The lists must be given with ';' delimiters."
+    echo
+    echo "The type list must be the proof type, e.g. 'RAT', 'RUP', 'RES' etc."
+    echo
+    echo "In the arguments, {s} is replaced with the current solver, {f} is replaced "
+    echo "with the current expansion file (or {e} for the full path), and {d} with "
+    echo "the EXP_DIR argument."
+    echo
+    echo "EXAMPLE USAGE: "
+    echo "    ${0} \"picosat;cadical\" \"rup;drat\" \"{e}\" \"--some-flag {e}\""
+    echo
+    echo "ARGUMENT DEFAULTS:"
+    echo "  [SQL_DB] automatically generated name of form 'benchmark-XXXX.sql'"
+    echo "  [EXP_DIR] defaults to '.'"
+    echo "  [EXP_FILE_PAT] defaults to all files in EXP_DIR if left empty"
+    exit 0
+fi
+
+date; hostname
+
+TEST_DIR="`dirname "${0}"`"
+source "${TEST_DIR}/.shared"
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~ Run Config ~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+SPACE_LIMIT="8192" # [MB]
+HOURS="0" # [h]
+MINS="15" # [m]
+SECS="0" # [s]
+TIME_LIMIT="`time2secs "${HOURS}" "${MINS}" "${SECS}"`"
+
+BASE_DIR="${HOME}/solver-comp"
+LOG_DIR="${BASE_DIR}/logs"
+mkdir -p "${BASE_DIR}" "${LOG_DIR}"
+LOG_PATH="${LOG_DIR}/solver-proof-comp_00_%j.log"
+
+PARAL="`parallel "solver-proof-comp" "c1" "${SPACE_LIMIT}" "${TIME_LIMIT}" "${LOG_PATH}"`"
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~ Set Up ~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+assert_cmd sqlite3
+
+OLD_IFS="${IFS}"
+IFS=";"
+SOLVERS=( ${1} )
+PROOF_TYPES=( ${2} )
+ARGS=( ${3} )
+IFS="${OLD_IFS}"
+if [[ "${#SOLVERS[@]}" -lt 1 ]]; then
+    echo "No solvers supplied (${#SOLVERS[@]} < 1)..."
+    exit 2
+fi
+if [[ "${#PROOF_TYPES[@]}" -ne "${#SOLVERS[@]}" ]]; then
+    echo "Not enough proof types supplied (${#PROOF_TYPES[@]} != ${#SOLVERS[@]})..."
+    exit 2
+fi
+if [[ "${#ARGS[@]}" -ne "${#SOLVERS[@]}" ]]; then
+    echo "Not enough args supplied (${#ARGS[@]} != ${#SOLVERS[@]})..."
+    exit 2
+fi
+for solver in ${SOLVERS[@]}; do
+    assert_cmd "${solver}"
+    echo "Found solver '${solver}'"
+done
+
+EXP_DIR="`pwd`"
+FILE_EXPR="*"
+if [[ -n "${4}" ]]; then
+    DB=`realpath "${4}"`
+    if [[ -n "${5}" ]]; then
+        EXP_DIR="`realpath "${5}"`";
+        if [[ -n "${6}" ]]; then
+            FILE_EXPR="${6}";
+        fi
+    fi
+else
+    # Create database schema with unique file name, if not given already
+    DB="`mktemp -p . benchmark-solver-XXXX.sql`"
+fi
+# Look up expansion CNF files based on given pattern
+echo "Using expansion CNF file pattern '${FILE_EXPR}' for directory '${EXP_DIR}'"
+EXP_FILES="`find "${EXP_DIR}" -name "${FILE_EXPR}" -type f`"
+
+if [[ ! -f "${DB}" ]]; then touch "${DB}"; fi
+
+int_cleanup() {
+    exit "$1"
+}
+trap "int_cleanup 130" SIGINT
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~ SQL Set Up ~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+echo "Writing to SQL-DB '${DB}'"
+# Run a SQLITE command for our generated database file
+sqlite3 <<- EOF
+.open '${DB}'
+
+CREATE TABLE IF NOT EXISTS benchmark(
+    solver TEXT NOT NULL,
+    proof_type TEXT NOT NULL,
+    fname TEXT NOT NULL,
+    sat INT NOT NULL,
+    tottime_s REAL NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS errors(
+    solver TEXT NOT NULL,
+    fname TEXT,
+    reason TEXT NOT NULL
+);
+EOF
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~ Main Loop ~~~~~~~~~~~~~~~~~~~~
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+(
+    trap 'kill 0; int_cleanup 130' SIGINT;
+
+    msg_start
+
+    FIRST=1
+    for exp_file in ${EXP_FILES}; do
+        if [[ "${FIRST}" -ne 1 ]]; then echo; echo; fi
+        FIRST=0
+        section "Running for expansion CNF file '${exp_file}'"
+        echo
+
+        for i in $(seq 0 $(( ${#SOLVERS[@]} - 1 ))); do
+            solver="${SOLVERS[i]}"
+            proof_type="${PROOF_TYPES[i]}"
+            args="${ARGS[i]}"
+            exp_file_base="`basename "${exp_file}"`"
+            args="${args//\{e\}/${exp_file}}"
+            args="${args//\{f\}/${exp_file_base}}"
+            args="${args//\{s\}/${solver}}"
+            args="${args//\{d\}/${EXP_DIR}}"
+            ${PARAL} \
+                ${TEST_DIR}/benchmark-solvers-instance \
+                "${DB}" "${solver}" "${proof_type}" "${args}" "${exp_file}" \
+                "${TEST_DIR}" "${SPACE_LIMIT}" "${TIME_LIMIT}" &
+        done
+    done
+    wait
+)
+
+int_cleanup 0

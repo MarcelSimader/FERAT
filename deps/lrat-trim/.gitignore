@@ -1,0 +1,5 @@
+makefile
+lrat-trim
+*.gcda
+*.gcno
+*.gcov

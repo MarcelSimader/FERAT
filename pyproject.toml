@@ -1,0 +1,57 @@
+# Author: Marcel Simader (marcel.simader@jku.at)
+# Date: 14.11.2023
+
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ferat"
+version = "0.9.0"
+description = "\\forall-Exp+RAT (FERAT) is a new proof system for expansion based QBF solvers."
+readme = "README.md"
+authors = [{ name = "Marcel Simader", email = "marcel.simader@jku.at" }]
+classifiers = ["Programming Language :: Python :: 3.10"]
+requires-python = ">=3.10"
+license = { file = "./LICENSE" }
+
+[tool.setuptools]
+packages = ["ferat"]
+
+[tool.setuptools.package-data]
+ferat = ["bin/*"]
+
+[project.scripts]
+forall-exp-rat = "ferat.pipeline:main"
+ferat = "ferat.pipeline:main"
+
+[project.optional-dependencies]
+dev = [
+    "python-lsp-server[yapf]",
+    "pylsp-mypy",
+    "python-lsp-isort",
+]
+
+[project.urls]
+Homepage = "https://gitlab.sai.jku.at/marcel/forall-exp-rat"
+
+[tool.isort]
+split_on_trailing_comma = true
+combine_as_imports = true
+
+[tool.yapf]
+based_on_style="yapf"
+blank_lines_around_top_level_definition=1
+coalesce_brackets=true
+dedent_closing_brackets=true
+column_limit=79
+indent_dictionary_value=true
+indent_width=4
+join_multiple_lines=true
+spaces_before_comment=1
+split_before_arithmetic_operator=true
+split_before_bitwise_operator=true
+split_before_dot=true
+split_before_logical_operator=true
+split_complex_comprehension=true
+use_tabs=false
