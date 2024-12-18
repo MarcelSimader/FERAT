@@ -15,6 +15,9 @@ parallel builds, which are already automatically used in the subprojects):
 cmake -B build/ && make -C build/ [-j]
 ```
 
+> NOTE:
+> You may need to compile the dependencies with GCC-13, or older versions.
+
 ## How to Use
 
 > NOTE:
