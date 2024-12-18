@@ -1,4 +1,4 @@
-# \forall-Exp+RAT
+# FERAT
 
 FERAT (an acronym for \forall-Exp+RAT) is a clausal, interference proof system for
 expansion-based QBF solvers, utilizing (D)RAT as crucial new component. This differs from
